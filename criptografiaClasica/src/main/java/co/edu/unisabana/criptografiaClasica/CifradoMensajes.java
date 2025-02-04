@@ -4,18 +4,149 @@
 
 package co.edu.unisabana.criptografiaClasica;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
 /**
  *
  * @author analu
  */
 public class CifradoMensajes {
+    
+    private static final List<Character> ALFABETO = new ArrayList<>();
 
     public static void main(String[] args) {
-        String[] passwords = getPasswords(); // Contraseñas de rockYou
+        Scanner entrada = new Scanner(System.in);
+        
+        int opcionMenu, claveCesar;
+        String mensaje, claveVig;
+        String[] passwords = contrasenas(); // Contraseñas de rockYou
+        
+        passwords = java.util.Arrays.copyOf(passwords, 100); // Solo tomar los primeros 100 passwords
+        
+        // Rellenar lista de alfabeto
+        for (char letra = 'A'; letra <= 'Z'; letra++) {
+            ALFABETO.add(letra);
+        }
+        
+        do {
+            System.out.println("""
+                               \t----------------------------
+                               \t=== CRIPTOGRAFIA CLASICA ===
+                               Bienvenido! Seleccione una de las siguientes funciones:
+                               \t1. Cifrado Cesar
+                               \t2. Cifrado Vigenere
+                               \t3. Descifrado Cesar
+                               \t4. Descifrado Vigenere
+                               \t5. SALIR
+                               \nOpcion: """);
+            opcionMenu = entrada.nextInt();
+            entrada.nextLine(); 
+            
+            if (opcionMenu == 5) {
+                System.out.println("Vuelva pronto!");
+            } else if (opcionMenu < 0 || opcionMenu > 5) {
+                System.out.println("Numero invalido. Vuelva a intentar.\n");
+            }
+            else {
+                System.out.print("\nIngrese el mensaje que desea cifrar/descifrar: ");
+                mensaje = entrada.nextLine();
+
+                int opcionClave = 1;
+                // Preguntar si tiene clave solo para descifrado
+                if (opcionMenu > 2) { 
+                    System.out.print("Si dispone de una clave de encriptacion, ingrese 1. En caso contrario, ingrese otro numero: ");
+                    opcionClave = entrada.nextInt();
+                    entrada.nextLine();
+                }
+            
+                switch (opcionMenu) {
+                    case 1 -> {
+                        System.out.print("Ingrese la clave de encriptacion: ");
+                        claveCesar = entrada.nextInt();
+                        System.out.println("\n==> Mensaje cifrado por Cesar: " + cifradoCesar(mensaje, claveCesar) + "\n");
+                    }
+                    case 2 -> {
+                        System.out.print("Ingrese la clave de encriptacion: ");
+                        claveVig = entrada.nextLine();
+                        System.out.println("\n==> Mensaje cifrado por Vigenere: " + cifradoVigenere(mensaje, claveVig) + "\n");
+                    }
+                    case 3 -> {
+                        if (opcionClave == 1) {
+                            System.out.print("Ingrese la clave de encriptacion: ");
+                            claveCesar = entrada.nextInt();
+                        } else {
+                            claveCesar = 0;
+                        }
+                        descifradoCesar(mensaje, claveCesar, opcionClave);
+                    }
+                    default -> {
+                        if (opcionClave == 1) {
+                            System.out.print("Ingrese la clave de encriptacion: ");
+                            claveVig = entrada.nextLine();
+                        } else {
+                            claveVig = "";
+                        }
+                        descifradoVigenere(mensaje, claveVig, opcionClave);
+                    }
+                }      
+            }
+        } while (opcionMenu != 5);
     }
     
-    public static String[] getPasswords() {
-        String[] passwords = {
+    public static String cifradoCesar(String texto, int clave) {
+        String mensaje = "";
+        // Recorre cada carácter del texto, convirtiéndolo a mayúsculas y luego procesándolo
+        for (char caracter : texto.toUpperCase().toCharArray()) {
+            int nuevoIndex;
+            // Verifica si el carácter es una letra dentro del alfabeto (A-Z)
+            if (ALFABETO.contains(caracter)) {
+                int index = ALFABETO.indexOf(caracter); // Obtiene el índice actual de la letra en el alfabeto
+                
+                // Calcula el nuevo índice para el carácter, aplicando el desplazamiento (clave)
+                if (clave < 0) {
+                    nuevoIndex = (index + clave + 26) % 26; // Desplazamiento con clave negativa
+                } else {
+                    nuevoIndex = (index + clave) % 26; // Desplazamiento con clave positiva
+                }
+                // Añade5 letra del nuevo índice al mensaje cifrado
+                mensaje += ALFABETO.get(nuevoIndex);
+            } else {
+                mensaje += caracter; // Agrega caracter que no hace parte del alfabeto
+            }
+        }
+        return mensaje;
+    }
+    
+    public static void descifradoCesar(String texto, int clave, int opcionClave) {
+        if (opcionClave == 1) {
+            System.out.println("\n==> Mensaje descifrado por Cesar: " + cifradoCesar(texto, 26 - clave) + "\n");
+        } else {
+            System.out.println("\n==> Adivinacion del mensaje por fuerza bruta: \n");
+            for (int i = 1; i < 26; i++) {
+                System.out.println("Con clave " + i + ": " + cifradoCesar(texto, 26 - i));
+            }    
+            System.out.println("");
+        }
+    }
+    
+    public static String cifradoVigenere(String texto, String clave) {
+        String mensaje = "";
+        //
+        return mensaje;
+    }
+    
+    public static void descifradoVigenere(String texto, String clave, int opcionClave) {
+        if (opcionClave == 1) {
+            //
+        } else {
+            //
+        }
+    }
+    
+    public static String[] contrasenas() {
+        String[] contrasenas = {
                 "123456", "12345", "123456789", "password", "iloveyou", "princess", "1234567", "rockyou",
                 "12345678", "abc123", "nicole", "daniel", "babygirl", "monkey", "lovely", "jessica",
                 "654321", "michael", "ashley", "qwerty", "111111", "iloveu", "000000", "michelle",
@@ -379,6 +510,6 @@ public class CifradoMensajes {
                 "china", "567890", "1princess", "terry", "pangga", "klapaucius", "gemma", "froggie",
                 "felix", "washington", "reading", "qqqqqq", "pinkgirl"
         };
-        return passwords;
+        return contrasenas;
     }
 }
