@@ -21,9 +21,6 @@ public class CifradoMensajes {
         
         int opcionMenu, claveCesar;
         String mensaje, claveVig;
-        String[] passwords = contrasenas(); // Contraseñas de rockYou
-        
-        passwords = java.util.Arrays.copyOf(passwords, 100); // Solo tomar los primeros 100 passwords
         
         // Rellenar lista de alfabeto
         for (char letra = 'A'; letra <= 'Z'; letra++) {
@@ -86,7 +83,7 @@ public class CifradoMensajes {
                     case 4 -> {
                         if (opcionClave == 1) {
                             //System.out.println("Ingrese la clave de encriptacion: ");
-                            System.out.println("Ingrese la clave de encriptacion");
+                            System.out.println("Ingrese la clave de encriptacion: ");
                             entrada.nextLine();//por alguna jodida razón el cabrón compilador no hace caso a esta instrucción por lo que hay que ponerla 2 jodidas veces
                             claveVig = entrada.nextLine();
 
@@ -174,9 +171,11 @@ public class CifradoMensajes {
     public static void descifradoVigenere(String texto, String clave, int opcionClave) {
         if (opcionClave == 1) {
             String msjDecifrado = decifradoVigenereClave(texto, clave);
-            System.out.println(msjDecifrado);
+            System.out.println("\n==> Mensaje descifrado por Vignere: " + msjDecifrado + "\n");
         } else {
+            System.out.println("\n==> Adivinacion del mensaje por fuerza bruta: \n");
             descifradoVigenereSinClave(texto);
+            System.out.println("");
         }
     }
     
