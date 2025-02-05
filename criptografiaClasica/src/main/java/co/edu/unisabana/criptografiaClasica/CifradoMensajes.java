@@ -46,50 +46,56 @@ public class CifradoMensajes {
             
             if (opcionMenu == 5) {
                 System.out.println("Vuelva pronto!");
-            } else if (opcionMenu < 0 || opcionMenu > 5) {
+                System.exit(0);
+            }
+            
+            if (opcionMenu < 0 || opcionMenu > 5) {
                 System.out.println("Numero invalido. Vuelva a intentar.\n");
             }
             else {
-                System.out.print("\nIngrese el mensaje que desea cifrar/descifrar: ");
+                System.out.println("\nIngrese el mensaje que desea cifrar/descifrar: ");
                 mensaje = entrada.nextLine();
 
-                int opcionClave = 1;
+                int opcionClave = 0;
                 // Preguntar si tiene clave solo para descifrado
                 if (opcionMenu > 2) { 
                     System.out.print("Si dispone de una clave de encriptacion, ingrese 1. En caso contrario, ingrese otro numero: ");
                     opcionClave = entrada.nextInt();
-                    entrada.nextLine();
                 }
             
-                switch (opcionMenu) {
+                switch (opcionMenu) {//dependiendo de que la opción escogida
                     case 1 -> {
-                        System.out.print("Ingrese la clave de encriptacion: ");
+                        System.out.println("Ingrese la clave de encriptacion: ");
                         claveCesar = entrada.nextInt();
                         System.out.println("\n==> Mensaje cifrado por Cesar: " + cifradoCesar(mensaje, claveCesar) + "\n");
                     }
                     case 2 -> {
-                        System.out.print("Ingrese la clave de encriptacion: ");
+                        System.out.println("Ingrese la clave de encriptacion: ");
                         claveVig = entrada.nextLine();
                         System.out.println("\n==> Mensaje cifrado por Vigenere: " + cifradoVigenere(mensaje, claveVig) + "\n");
                     }
                     case 3 -> {
                         if (opcionClave == 1) {
-                            System.out.print("Ingrese la clave de encriptacion: ");
+                            System.out.println("Ingrese la clave de encriptacion: ");
                             claveCesar = entrada.nextInt();
                         } else {
                             claveCesar = 0;
                         }
                         descifradoCesar(mensaje, claveCesar, opcionClave);
-                    }
-                    default -> {
+                    }                 
+                    case 4 -> {
                         if (opcionClave == 1) {
-                            System.out.print("Ingrese la clave de encriptacion: ");
+                            //System.out.println("Ingrese la clave de encriptacion: ");
+                            System.out.println("Ingrese la clave de encriptacion");
+                            entrada.nextLine();//por alguna jodida razón el cabrón compilador no hace caso a esta instrucción por lo que hay que ponerla 2 jodidas veces
                             claveVig = entrada.nextLine();
-                        } else {
-                            claveVig = "";
-                        }
-                        descifradoVigenere(mensaje, claveVig, opcionClave);
-                    }
+
+                            descifradoVigenere(mensaje, claveVig, opcionClave);
+                        } else descifradoVigenere(mensaje, "", opcionClave);
+                      
+                        
+                    } 
+                    
                 }      
             }
         } while (opcionMenu != 5);
@@ -132,17 +138,78 @@ public class CifradoMensajes {
     }
     
     public static String cifradoVigenere(String texto, String clave) {
+        //fórmula => C = (M+k)mod26 siendo M el i-ésimo caracter de la cadena y k el i-ésimo caracter de la clave
         String mensaje = "";
-        //
+        char[] textoChar = texto.toUpperCase().toCharArray();
+        char[] claveCifra = new char[textoChar.length];//arreglo donde se va a adecuar la clave en funcion del mensaje
+        char[] claveChar = clave.toUpperCase().toCharArray();
+        int indexClave =0;
+
+        //asignar cada para caracter del texto,un caracter de la clave
+        for (int i =0 ; i< textoChar.length ; i++) {
+            if (textoChar[i] != ' ') {
+                claveCifra[i] = claveChar[indexClave];
+                if (indexClave < claveChar.length - 1)indexClave++;
+                else indexClave= 0;
+            }else{
+                claveCifra[i]= ' ';
+            }
+        }
+        
+        //aplicar la fórmula para cada caracter y determinar el nuevo caracter
+        for (int i = 0; i < textoChar.length; i++) {
+            if (textoChar[i] != ' ') {
+                int charNumero = (textoChar[i] + claveCifra[i])% ALFABETO.size();
+                char charCifrado = ALFABETO.get(charNumero);
+
+                //agregar cada caracter cifrado a una nueva cadena (mensaje) cuidando los espacios en blanco del texto original
+                mensaje += charCifrado;
+                            
+            }else mensaje += " ";
+        }
+        
         return mensaje;
     }
     
     public static void descifradoVigenere(String texto, String clave, int opcionClave) {
         if (opcionClave == 1) {
-            //
+            String msjDecifrado = decifradoVigenereClave(texto, clave);
+            System.out.println(msjDecifrado);
         } else {
-            //
+            descifradoVigenereSinClave(texto);
         }
+    }
+    
+    private static String decifradoVigenereClave(String mensajeCifrado, String clave){
+        StringBuilder mensajeDescifrado = new StringBuilder();
+        mensajeCifrado = mensajeCifrado.toUpperCase();
+        clave = clave.toUpperCase();
+
+        for (int i = 0, j = 0; i < mensajeCifrado.length(); i++) {
+            char c = mensajeCifrado.charAt(i);
+            if (c < 'A' || c > 'Z') {
+                mensajeDescifrado.append(c);
+                continue;
+            }
+            char k = clave.charAt(j % clave.length());
+            mensajeDescifrado.append((char) ((c - k + 26) % 26 + 'A'));
+            j++;
+        }
+
+        return mensajeDescifrado.toString();
+        
+        
+    }
+    
+    private static void descifradoVigenereSinClave(String texto){
+        String[] passwords = contrasenas(); // Contraseñas de rockYou
+        passwords = java.util.Arrays.copyOf(passwords, 100); // Solo tomar los primeros 100 passwords
+        for (int i = 0; i < 100; i++) {
+            String clave = passwords[i];
+            System.out.print("Clave \"" + clave + "\": ");
+            System.out.println(decifradoVigenereClave(texto, clave));
+        }
+        
     }
     
     public static String[] contrasenas() {
